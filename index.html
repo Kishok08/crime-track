@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090d13">
+  <meta name="description" content="CrimeScope UK — explore official UK recorded-crime data with interactive mapping, a spatial density model and opt-in location alerts.">
+  <title>CrimeScope UK — Crime intelligence explorer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090d13'/%3E%3Cpath d='M32 9 54 20v16c0 13-10 20-22 24C20 56 10 49 10 36V20L32 9Z' fill='none' stroke='%23c6f378' stroke-width='5'/%3E%3Cpath d='m22 33 7 7 14-16' fill='none' stroke='%23c6f378' stroke-width='5'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="CrimeScope UK home"><span class="brand-mark">◈</span><span><strong>CRIMESCOPE</strong><small>UK / INTELLIGENCE</small></span></a>
+      <div class="side-section">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button class="nav-link active" data-page="overview"><span>▦</span> Overview <em>01</em></button>
+        <button class="nav-link" data-page="explore"><span>◎</span> Explore map <em>02</em></button>
+        <button class="nav-link" data-page="intelligence"><span>↗</span> Intelligence <em>03</em></button>
+        <button class="nav-link" data-page="reports"><span>▤</span> My reports <em>04</em></button>
+      </nav>
+      <div class="side-section side-section-second">INFORMATION</div>
+      <nav><button class="nav-link" data-page="method"><span>ⓘ</span> Data & methodology</button></nav>
+      <div class="side-bottom">
+        <div class="side-data"><span class="live-dot"></span> OFFICIAL DATA CONNECTOR <strong id="connectionText">Connecting…</strong></div>
+        <div class="side-mini">Independent portfolio project.<br>Not a police or emergency service.</div>
+        <div class="side-footer"><span>© 2026 CRIMESCOPE UK</span><span>V1.0</span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumbs">WORKSPACE <span>/</span> <strong id="currentPage">OVERVIEW</strong></div>
+        <div class="top-actions">
+          <div class="header-status"><span class="live-dot"></span><span id="dataMonthMini">Checking dataset</span></div>
+          <button class="icon-button" id="geoButton" title="Use current location" aria-label="Use my location">⌖</button>
+          <div class="avatar" title="Visitor mode">CS</div>
+        </div>
+      </header>
+      <div class="content">
+        <section class="page page-active" id="page-overview">
+          <div class="intro"><div><div class="eyebrow"><i></i> PUBLIC SAFETY / OPEN INTELLIGENCE <span class="intro-number">PLATFORM 001</span></div><h1>Know your area<span class="title-period">.</span><br><span class="muted-heading">Understand the patterns.</span></h1><p class="intro-text">Explore recorded crime, detect spatial patterns and get opt-in location alerts with a transparent, data-informed model.</p></div><div class="intro-decoration">01<span>/04</span></div></div>
+          <div class="search-bar">
+            <div class="search-icon">⌕</div><input id="locationInput" type="search" placeholder="Search a UK town, city or postcode…" aria-label="Search location" autocomplete="off">
+            <button id="searchButton" class="primary-btn">Explore area <span>↗</span></button>
+          </div>
+          <div class="quick-places" aria-label="Quick locations">
+            <span class="quick-label">QUICK ACCESS</span>
+            <button data-place="Crawley">Crawley</button><button data-place="London">London</button><button data-place="Brighton">Brighton</button><button data-place="Birmingham">Birmingham</button><button data-place="Manchester">Manchester</button>
+          </div>
+          <div class="section-heading"><div><span class="eyebrow-sub">REGIONAL OVERVIEW</span><h2 id="regionTitle">Crawley, England</h2></div><div class="section-heading-end"><span class="dataset-tag" id="datasetLabel">Awaiting dataset</span><select id="monthSelect" aria-label="Choose police data month"><option value="">Latest available</option></select></div></div>
+          <div class="metrics">
+            <article class="metric-card"><div class="metric-top">RECORDED INCIDENTS <span>↗</span></div><div class="metric-number" id="metricIncidents">—</div><div class="metric-foot" id="metricIncidentsFoot">Within the official API search area</div></article>
+            <article class="metric-card"><div class="metric-top">CRIME CATEGORIES <span>◫</span></div><div class="metric-number" id="metricCategories">—</div><div class="metric-foot">Distinct recorded offence groups</div></article>
+            <article class="metric-card"><div class="metric-top">MOST REPORTED <span>◉</span></div><div class="metric-text" id="metricTop">—</div><div class="metric-foot" id="metricTopFoot">Based on available records</div></article>
+            <article class="metric-card metric-card-accent"><div class="metric-top">MONTHLY CHANGE <span>↗</span></div><div class="metric-number" id="metricTrend">—</div><div class="metric-foot" id="metricTrendFoot">Comparing previous available month</div></article>
+          </div>
+          <div class="primary-grid">
+            <section class="panel map-panel"><div class="panel-head"><div><span class="eyebrow-sub">GEOSPATIAL INTELLIGENCE</span><h3>Crime distribution map</h3></div><div class="segmented" role="group" aria-label="Map display mode"><button id="heatMode" class="selected">Heatmap</button><button id="pointMode">Points</button></div></div><div class="map-wrap"><div id="map" role="application" aria-label="Interactive crime map"></div><div class="map-float"><span class="live-dot"></span><strong>OFFICIAL POLICE DATA</strong><span id="mapDate">MONTH —</span></div><div class="map-legend"><span>RELATIVE DENSITY</span><div class="legend-gradient"></div><small>LOW <span>HIGH</span></small></div><button id="recenterMap" class="recenter" title="Return map to selected location">⌖</button></div><div class="panel-footer"><span>Tap the map to inspect a location's historical density.</span><span>Approximate incident locations</span></div></section>
+            <section class="panel risk-panel"><div class="panel-head"><div><span class="eyebrow-sub">SPATIAL MODEL / KDE</span><h3>Area risk explorer</h3></div><div class="ai-indicator">◇ ML MODEL</div></div><div class="risk-inner"><div class="risk-ring-wrap"><div class="risk-ring" id="riskRing"><div class="risk-ring-center"><span>RELATIVE<br>PERCENTILE</span><strong id="riskPercentile">—</strong></div></div></div><div id="riskLabel" class="risk-label">Awaiting records</div><p id="riskDescription" class="risk-description">A spatial density model will compare the selected point with other nearby points after data loads.</p><div class="model-lines"><div><span>MODEL</span><strong>Gaussian KDE</strong></div><div><span>INPUT DATA</span><strong id="modelSamples">— records</strong></div><div><span>SEARCH AREA</span><strong>Approx. 1 mile</strong></div><div><span>CONFIDENCE</span><strong id="modelConfidence">—</strong></div></div><div class="alert-card"><div><span class="alert-icon">◎</span><strong>Area-entry alerts</strong><small>Location monitoring while this page is open.</small></div><label class="switch"><input id="alertToggle" type="checkbox" aria-label="Enable area-entry alerts"><span></span></label></div><p class="model-disclaimer">This is a comparative indicator of historical recorded-crime density, <strong>not a prediction or guarantee of personal safety.</strong></p></div></section>
+          </div>
+          <div class="secondary-grid">
+            <section class="panel chart-panel"><div class="panel-head"><div><span class="eyebrow-sub">CATEGORY ANALYSIS</span><h3>Incident breakdown</h3></div><span class="small-hint">Top recorded types</span></div><div id="categoryBars" class="bars"><div class="empty-placeholder">Waiting for the police dataset…</div></div></section>
+            <section class="panel insight-panel"><div class="panel-head"><div><span class="eyebrow-sub">INTERPRETATION</span><h3>What the data says</h3></div><span class="small-hint">Auto-generated facts</span></div><div class="insight-content" id="insights"><div class="empty-placeholder">Insights appear after records load.</div></div><button class="text-link" data-go="intelligence">Explore full intelligence <span>↗</span></button></section>
+          </div>
+          <div class="bottom-note">DATA: <a href="https://data.police.uk/" target="_blank" rel="noopener">DATA.POLICE.UK</a> · OPEN GOVERNMENT LICENCE V3.0 · HISTORICAL, ANONYMISED LOCATIONS · NOT FOR EMERGENCY USE</div>
+        </section>
+        <section class="page" id="page-explore">
+          <div class="subpage-intro"><span class="eyebrow-sub">MAP EXPLORER / 02</span><h1>Explore the <span class="muted-heading">streets.</span></h1><p>Inspect actual reported crime records, change locations and examine the model at any mapped point.</p></div>
+          <div class="explore-layout">
+            <div class="panel explore-map-panel"><div class="panel-head"><div><h3 id="exploreRegion">Crawley / Crime map</h3><span class="small-hint">Click anywhere on the map to move the analysis point</span></div><div class="segmented"><button class="selected" id="exploreHeat">Heatmap</button><button id="explorePoints">Points</button></div></div><div id="exploreMap" class="explore-map" role="application" aria-label="Crime explorer map"></div></div>
+            <div class="panel explore-side"><div class="panel-head"><div><span class="eyebrow-sub">FILTER RECORDS</span><h3>Explore incidents</h3></div></div><label class="field-label" for="crimeCategory">Crime category</label><select id="crimeCategory" class="full-select"><option value="all">All categories</option></select><label class="field-label" for="crimeSearch">Location / street</label><input id="crimeSearch" class="field" type="search" placeholder="Filter by street name"><div class="filter-stats"><span>RESULTS</span><strong id="filterCount">—</strong></div><div id="incidentList" class="incident-list"></div><div class="pagination"><button id="prevPage">← Previous</button><span id="pageNumber">Page 1</span><button id="nextPage">Next →</button></div><button id="exportCrimes" class="outline-btn">↓ Export filtered records (CSV)</button></div>
+          </div>
+        </section>
+        <section class="page" id="page-intelligence">
+          <div class="subpage-intro"><span class="eyebrow-sub">ANALYTICAL INTELLIGENCE / 03</span><h1>Beyond the <span class="muted-heading">numbers.</span></h1><p>A transparent, non-parametric spatial machine-learning model trained directly on the currently loaded police records.</p></div>
+          <div class="intelligence-grid"><div class="panel intel-feature"><span class="eyebrow-sub">MACHINE LEARNING MODEL</span><h2>Gaussian kernel<br>density estimation<span class="title-period">.</span></h2><p>Each reported incident contributes a smooth spatial kernel. The model compares estimated density at your selected point against a grid of nearby locations. This reveals relative concentrations without inventing future crime events.</p><div class="intel-stat-row"><div><small>TRAINING OBSERVATIONS</small><strong id="intelSample">—</strong></div><div><small>BANDWIDTH</small><strong>450 m</strong></div><div><small>MODEL TYPE</small><strong>Unsupervised</strong></div></div></div><div class="panel intel-summary"><span class="eyebrow-sub">MODEL HEALTH</span><h3>Transparent by design</h3><div id="intelHealth" class="intel-health">Waiting for records…</div><div class="divider"></div><p>The categories and counts are descriptive statistics. The percentile is relative to positions across the selected search area, not a probability of victimisation.</p></div></div>
+          <section class="panel full-breakdown"><div class="panel-head"><div><span class="eyebrow-sub">ALL CRIME CATEGORIES</span><h3>Recorded crime composition</h3></div><button id="exportSummary" class="outline-btn compact">↓ Download CSV</button></div><div id="fullBreakdown" class="full-breakdown-body"></div></section>
+        </section>
+        <section class="page" id="page-reports">
+          <div class="subpage-intro"><span class="eyebrow-sub">PERSONAL WORKSPACE / 04</span><h1>Incident <span class="muted-heading">notes.</span></h1><p>Keep a personal journal of observations for demonstration purposes. Entries remain on this device and are not sent to police or other users.</p></div>
+          <div class="warning-banner"><strong>Important:</strong> This is not a police reporting service. To report a crime use <a href="https://www.police.uk/pu/contact-us/" target="_blank" rel="noopener">police.uk</a>; for emergencies in the UK call 999. Avoid entering names or other sensitive information.</div>
+          <div class="report-grid"><form id="reportForm" class="panel report-form"><div class="panel-head"><div><span class="eyebrow-sub">CREATE A LOCAL NOTE</span><h3>New observation</h3></div></div><label class="field-label" for="reportType">Type of observation</label><select id="reportType" class="full-select" required><option value="">Choose a category</option><option>Anti-social behaviour</option><option>Suspicious activity</option><option>Road / public space concern</option><option>General safety observation</option></select><label class="field-label" for="reportArea">Area (no exact address)</label><input id="reportArea" class="field" required maxlength="90" placeholder="e.g. Central Crawley"><label class="field-label" for="reportDetails">Observation</label><textarea id="reportDetails" class="field" required rows="6" maxlength="1000" placeholder="Describe what you observed. Do not include names, addresses or personal data."></textarea><button class="primary-btn full-button" type="submit">Save on this device <span>↗</span></button><small class="field-note">Stored only in your browser's local storage. Clearing browser data removes notes.</small></form><section class="panel saved-panel"><div class="panel-head"><div><span class="eyebrow-sub">LOCAL JOURNAL</span><h3>Saved observations</h3></div><button id="exportNotes" class="outline-btn compact">↓ CSV</button></div><div id="savedNotes" class="saved-notes"></div></section></div>
+        </section>
+        <section class="page" id="page-method">
+          <div class="subpage-intro"><span class="eyebrow-sub">TRANSPARENCY / METHODOLOGY</span><h1>Read the <span class="muted-heading">fine print.</span></h1><p>What this platform shows, how the machine-learning layer works and where its limitations lie.</p></div>
+          <div class="method-grid"><article class="panel method-card"><span class="method-number">01</span><h3>Official source</h3><p>Recorded street-level crime data comes from the public UK Police API. Incidents are released by month, sometimes with a significant delay. They are not real-time alerts.</p><a href="https://data.police.uk/docs/method/crime-street/" target="_blank" rel="noopener">Police API documentation ↗</a></article><article class="panel method-card"><span class="method-number">02</span><h3>Spatial uncertainty</h3><p>Police coordinates are deliberately anonymised and approximate. Hotspots represent patterns in mapped records, not precise crime scenes, offender locations or the actual boundaries of safe places.</p><a href="https://data.police.uk/about/" target="_blank" rel="noopener">About the data ↗</a></article><article class="panel method-card"><span class="method-number">03</span><h3>Machine learning</h3><p>An unsupervised Gaussian KDE is fitted to incident coordinates. A percentile compares the result with a grid around the search point. It does not predict individual incidents or personal safety.</p><a href="https://en.wikipedia.org/wiki/Kernel_density_estimation" target="_blank" rel="noopener">Kernel density estimation ↗</a></article><article class="panel method-card"><span class="method-number">04</span><h3>Privacy & alerts</h3><p>Geolocation requires explicit permission and is processed in the active browser tab. A new police-data query uses your coordinates when you change the selected area. No account or background tracking is provided.</p><a href="https://www.police.uk/" target="_blank" rel="noopener">Official police website ↗</a></article></div>
+          <div class="method-banner"><strong>UK coverage note</strong><p>Street-level coverage is broadly intended for England, Wales and Northern Ireland. In Scotland only limited British Transport Police data may appear. A low count does not mean an area is safe. Population, reporting rates, time of day and local context are not controlled for.</p></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
